@@ -171,8 +171,8 @@ public static class WavUtil
                 }
             }
         }
-        Console.WriteLine("numChannels: " + numChannels);
-        Console.WriteLine("sampFreq: " + sampFreq);
+        // Console.WriteLine("numChannels: " + numChannels);
+        // Console.WriteLine("sampFreq: " + sampFreq);
     }
 
     private static double[][] ReadDataChunk(byte[] chunk, int numChannels)
