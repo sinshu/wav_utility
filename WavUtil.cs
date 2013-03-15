@@ -26,7 +26,7 @@ public static class WavUtil
 
                 while (br.ReadInt32() != FmtHeader)
                 {
-                    br.BaseStream.Seek(br.ReadInt32(), SeekOrigin.Current);
+                    br.BaseStream.Seek(br.ReadInt32() + 1 >> 1 << 1, SeekOrigin.Current);
                 }
 
                 int numChannels;
@@ -34,11 +34,12 @@ public static class WavUtil
                     byte[] chunk = new byte[br.ReadInt32()];
                     br.Read(chunk, 0, chunk.Length);
                     ReadFmtChunk(chunk, out numChannels, out sampFreq);
+                    if ((chunk.Length & 1) > 0) br.ReadByte();
                 }
 
                 while (br.ReadInt32() != DataHeader)
                 {
-                    br.BaseStream.Seek(br.ReadInt32(), SeekOrigin.Current);
+                    br.BaseStream.Seek(br.ReadInt32() + 1 >> 1 << 1, SeekOrigin.Current);
                 }
 
                 {
@@ -129,9 +130,9 @@ public static class WavUtil
         {
             foreach (double s in d)
             {
-                if (max < s)
+                if (max < Math.Abs(s))
                 {
-                    max = s;
+                    max = Math.Abs(s);
                 }
             }
         }
@@ -178,10 +179,10 @@ public static class WavUtil
     private static double[][] ReadDataChunk(byte[] chunk, int numChannels)
     {
         int pcmLength = chunk.Length / (2 * numChannels);
-        double[][] dst = new double[numChannels][];
+        double[][] data = new double[numChannels][];
         for (int ch = 0; ch < numChannels; ch++)
         {
-            dst[ch] = new double[pcmLength];
+            data[ch] = new double[pcmLength];
         }
         using (MemoryStream ms = new MemoryStream(chunk))
         {
@@ -191,11 +192,11 @@ public static class WavUtil
                 {
                     for (int ch = 0; ch < numChannels; ch++)
                     {
-                        dst[ch][t] = br.ReadInt16() / 32768.0;
+                        data[ch][t] = br.ReadInt16() / 32768.0;
                     }
                 }
             }
         }
-        return dst;
+        return data;
     }
 }
