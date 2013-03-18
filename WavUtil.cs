@@ -74,7 +74,6 @@ public static class WavUtil
         int pcmLength = data[0].Length;
         int dataChunkSize = 2 * numChannels * pcmLength;
         int riffChunkSize = dataChunkSize + 36;
-        bool clipped = false;
         using (FileStream fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
         {
             using (BinaryWriter bw = new BinaryWriter(fs))
@@ -92,6 +91,7 @@ public static class WavUtil
                 bw.Write((short)16);
                 bw.Write(DataHeader);
                 bw.Write(dataChunkSize);
+                bool clipped = false;
                 for (int t = 0; t < pcmLength; t++)
                 {
                     for (int ch = 0; ch < numChannels; ch++)
@@ -110,11 +110,11 @@ public static class WavUtil
                         bw.Write((short)s);
                     }
                 }
+                if (clipped)
+                {
+                    Console.Error.WriteLine("クリップした／(^o^)＼");
+                }
             }
-        }
-        if (clipped)
-        {
-            Console.Error.WriteLine("クリップした／(^o^)＼");
         }
     }
 
@@ -123,7 +123,7 @@ public static class WavUtil
         Write(fileName, new double[][] { data }, sampFreq);
     }
 
-    public static void Normalize(double[][] data)
+    public static void Normalize(params double[][] data)
     {
         double max = double.MinValue;
         foreach (double[] d in data)
@@ -143,11 +143,6 @@ public static class WavUtil
                 data[ch][t] = 0.99 * data[ch][t] / max;
             }
         }
-    }
-
-    public static void Normalize(double[] data)
-    {
-        Normalize(new double[][] { data });
     }
 
     private static void ReadFmtChunk(byte[] chunk, out int numChannels, out int sampFreq)
