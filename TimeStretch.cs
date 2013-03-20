@@ -12,7 +12,7 @@ public class TimeStretch
         while (true)
         {
             int srcStartIndex = (int)((double)curDstEndIndex / dst.Length * src.Length);
-            int connectStartIndex = CalcConnectStartIndex(dst, curDstEndIndex, src, srcStartIndex, overlapLength, searchLength);
+            int connectStartIndex = FindConnectStartIndex(dst, curDstEndIndex, src, srcStartIndex, overlapLength, searchLength);
             for (int t = 0; t < overlapLength; t++)
             {
                 if (connectStartIndex + t == dst.Length || srcStartIndex + t == src.Length) return dst;
@@ -39,7 +39,7 @@ public class TimeStretch
         return sum;
     }
 
-    private static int CalcConnectStartIndex(double[] dst, int dstEndIndex, double[] src, int srcStartIndex, int overlapLength, int searchLength)
+    private static int FindConnectStartIndex(double[] dst, int dstEndIndex, double[] src, int srcStartIndex, int overlapLength, int searchLength)
     {
         int dstSearchStartIndex = dstEndIndex - overlapLength - searchLength;
         double minDiff = double.MaxValue;
